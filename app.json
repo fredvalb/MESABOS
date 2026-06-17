@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Mes Abos",
+    "slug": "mes-abos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0f13"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mesabos.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#7c3aed"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.mesabos.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "react-native-iap"
+    ]
+  }
+}
