@@ -3,7 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
   Modal, Linking, Alert, StyleSheet, StatusBar, SectionList, Dimensions
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as RNIap from 'react-native-iap';
 
@@ -63,6 +63,15 @@ const SERVICE_SECTIONS = CATEGORIES.filter(c => c !== 'Tous')
   .filter(section => section.data.length > 0);
 
 export default function App() {
+  return (
+    <SafeAreaProvider>
+      <AppContent />
+    </SafeAreaProvider>
+  );
+}
+
+function AppContent() {
+  const insets = useSafeAreaInsets();
   const [subs, setSubs] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -209,7 +218,6 @@ export default function App() {
   };
 
   return (
-    <SafeAreaProvider>
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0f0f13" />
 
@@ -351,7 +359,7 @@ export default function App() {
       {/* Modal principal ajout/edition */}
       <Modal visible={showModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
+          <View style={[styles.modalBox, { paddingBottom: 24 + insets.bottom }]}>
             <Text style={styles.modalTitle}>{editingId ? 'Modifier abonnement' : 'Nouvel abonnement'}</Text>
 
             <View style={{ marginBottom: 12 }}>
@@ -449,7 +457,7 @@ export default function App() {
       {/* Modal liste deroulante services */}
       <Modal visible={showServicePicker} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalBox, { height: PICKER_HEIGHT }]}>
+          <View style={[styles.modalBox, { height: PICKER_HEIGHT, paddingBottom: 24 + insets.bottom }]}>
             <Text style={styles.modalTitle}>Choisir un service</Text>
             <SectionList
               style={{ flex: 1 }}
@@ -480,7 +488,7 @@ export default function App() {
       {/* Modal paywall */}
       <Modal visible={showPaywall} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
+          <View style={[styles.modalBox, { paddingBottom: 24 + insets.bottom }]}>
             <Text style={styles.modalTitle}>Débloquer l'illimité</Text>
             <Text style={styles.paywallText}>
               La version gratuite est limitée à {FREE_LIMIT} abonnements suivis. Débloque le suivi illimité avec un achat unique de 4,99 €, valable à vie.
@@ -498,7 +506,6 @@ export default function App() {
         </View>
       </Modal>
     </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 
