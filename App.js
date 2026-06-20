@@ -493,10 +493,10 @@ function AppContent() {
             <Text style={styles.paywallText}>
               La version gratuite est limitée à {FREE_LIMIT} abonnements suivis. Débloque le suivi illimité avec un achat unique de 4,99 €, valable à vie.
             </Text>
-            <TouchableOpacity style={styles.btnPrimary} onPress={handleUpgrade}>
+            <TouchableOpacity style={[styles.btnPrimary, { flex: 0 }]} onPress={handleUpgrade}>
               <Text style={{ color: '#fff', fontWeight: '700' }}>Débloquer pour 4,99 €</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.btnSecondary, { marginTop: 12, marginRight: 0 }]} onPress={handleRestore}>
+            <TouchableOpacity style={[styles.btnSecondary, { flex: 0, marginTop: 12, marginRight: 0 }]} onPress={handleRestore}>
               <Text style={{ color: '#888', fontWeight: '600' }}>Restaurer mes achats</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnBack} onPress={() => setShowPaywall(false)}>
