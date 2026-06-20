@@ -6,6 +6,9 @@ import {
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as RNIap from 'react-native-iap';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
 
 const PICKER_HEIGHT = Dimensions.get('window').height * 0.7;
 const STORAGE_KEY = 'mesabos_subscriptions';
@@ -217,6 +220,59 @@ function AppContent() {
     ]);
   };
 
+  const csvEscape = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+
+  const exportData = async (format) => {
+    if (!subs.length) {
+      Alert.alert('Aucune donnée', "Tu n'as encore aucun abonnement à exporter.");
+      return;
+    }
+    try {
+      const date = new Date().toISOString().slice(0, 10);
+      let content, filename, mimeType;
+      if (format === 'csv') {
+        const header = 'Nom,Categorie,Montant,Facturation,Prochaine date,Lien resiliation';
+        const rows = subs.map(s => [s.name, s.category, s.amount, s.billing, s.nextDate, s.cancelUrl].map(csvEscape).join(','));
+        content = [header, ...rows].join('\n');
+        filename = `mes-abos-export-${date}.csv`;
+        mimeType = 'text/csv';
+      } else {
+        content = JSON.stringify(subs, null, 2);
+        filename = `mes-abos-sauvegarde-${date}.json`;
+        mimeType = 'application/json';
+      }
+      const fileUri = FileSystem.documentDirectory + filename;
+      await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, { mimeType, dialogTitle: 'Exporter mes abonnements' });
+      } else {
+        Alert.alert('Export réussi', `Fichier enregistré : ${fileUri}`);
+      }
+    } catch (e) {
+      Alert.alert('Erreur', "L'export a échoué.");
+    }
+  };
+
+  const importData = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({ type: 'application/json', copyToCacheDirectory: true });
+      if (result.canceled) return;
+      const content = await FileSystem.readAsStringAsync(result.assets[0].uri);
+      const parsed = JSON.parse(content);
+      if (!Array.isArray(parsed)) throw new Error('format invalide');
+      Alert.alert(
+        'Importer la sauvegarde',
+        `Remplacer tes ${subs.length} abonnement(s) actuel(s) par les ${parsed.length} du fichier ?`,
+        [
+          { text: 'Annuler', style: 'cancel' },
+          { text: 'Importer', onPress: () => setSubs(parsed) },
+        ]
+      );
+    } catch (e) {
+      Alert.alert('Erreur', "Impossible de lire ce fichier. Vérifie qu'il s'agit bien d'une sauvegarde Mes Abos (.json).");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0f0f13" />
@@ -295,6 +351,17 @@ function AppContent() {
                 </View>
               );
             })}
+
+            <Text style={styles.sectionTitle}>Sauvegarde</Text>
+            <TouchableOpacity style={styles.backupBtn} onPress={() => exportData('json')}>
+              <Text style={styles.backupBtnText}>Exporter une sauvegarde (.json)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.backupBtn} onPress={() => exportData('csv')}>
+              <Text style={styles.backupBtnText}>Exporter pour tableur Excel/Sheets (.csv)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.backupBtn, { marginBottom: 0 }]} onPress={importData}>
+              <Text style={styles.backupBtnText}>Importer une sauvegarde (.json)</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -517,6 +584,8 @@ const styles = StyleSheet.create({
   premiumBanner: { backgroundColor: '#7c3aed22', borderWidth: 1, borderColor: '#7c3aed55', borderRadius: 12, padding: 12, marginTop: 16, alignItems: 'center' },
   premiumBannerText: { color: '#a78bfa', fontWeight: '700', fontSize: 13 },
   paywallText: { color: '#ccc', fontSize: 14, lineHeight: 20, marginBottom: 20 },
+  backupBtn: { backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#ffffff15', borderRadius: 12, padding: 14, marginBottom: 10, alignItems: 'center' },
+  backupBtnText: { color: '#a78bfa', fontWeight: '600', fontSize: 13 },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
   tabs: { flexDirection: 'row', margin: 12, backgroundColor: '#1a1a2e', borderRadius: 12, padding: 4 },
   tab: { flex: 1, paddingVertical: 8, borderRadius: 9, alignItems: 'center' },
