@@ -231,9 +231,11 @@ function AppContent() {
       const date = new Date().toISOString().slice(0, 10);
       let content, filename, mimeType;
       if (format === 'csv') {
+        const title = csvEscape('Mes Abonnements');
         const header = 'Nom,Categorie,Montant,Facturation,Prochaine date,Lien resiliation';
-        const rows = subs.map(s => [s.name, s.category, s.amount, s.billing, s.nextDate, s.cancelUrl].map(csvEscape).join(','));
-        content = [header, ...rows].join('\n');
+        const formatAmount = (n) => n.toFixed(2).replace('.', ',') + ' €';
+        const rows = subs.map(s => [s.name, s.category, formatAmount(s.amount), s.billing, s.nextDate, s.cancelUrl].map(csvEscape).join(','));
+        content = [title, '', header, ...rows].join('\n');
         filename = `mes-abos-export-${date}.csv`;
         mimeType = 'text/csv';
       } else {
