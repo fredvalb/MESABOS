@@ -22,6 +22,8 @@ Mes Abos t'aide à garder le contrôle sur toutes tes dépenses récurrentes : t
 
 🔒 100% privé — Toutes tes données restent sur ton téléphone. Aucun compte, aucun serveur, aucun partage avec des tiers.
 
+💾 Sauvegarde et export — Exporte tes abonnements en un fichier de sauvegarde (et réimporte-le sur un nouvel appareil), ou en fichier Excel/Sheets pour les analyser à ta façon.
+
 **Version gratuite et illimitée**
 
 La version gratuite te permet de suivre jusqu'à 8 abonnements. Besoin de plus ? Débloque le suivi illimité avec un seul achat, à vie, pour 4,99 € — pas d'abonnement, pas de frais récurrents.
